@@ -17,6 +17,10 @@ export const useCompressor = (initialMode: 'compress' | 'decompress' = 'compress
     processInput(input);
   }, [mode, input]);
 
+  const countIcons = (text: string) => {
+    return text.match(/\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu)?.length || 0;
+  };
+
   const compress = (text: string) => {
     return text.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join('');
   };
@@ -38,8 +42,8 @@ export const useCompressor = (initialMode: 'compress' | 'decompress' = 'compress
     const processedOutput = mode === 'compress' ? compress(text) : decompress(text);
     setOutput(processedOutput);
     setCharCount({
-      before: text.length,
-      after: processedOutput.length
+      before: mode === 'compress' ? text.length : countIcons(text),
+      after: mode === 'compress' ? countIcons(processedOutput) : processedOutput.length
     });
   };
 

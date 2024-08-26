@@ -27,7 +27,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   };
 
   const compress = (text: string) => {
-    return text.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join('');
+    return text.split('').map((char: string) => CODEBOOK[char.toUpperCase()] || char).join('');
   };
 
   const decompress = (text: string) => {

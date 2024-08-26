@@ -1,4 +1,4 @@
-export const CODEBOOK = {
+export const CODEBOOK: {[p: string]: string} = {
     '0': '🔴🟢',
     '1': '🔴🔵',
     '2': '🔵🔵🔵',

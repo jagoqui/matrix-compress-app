@@ -28,7 +28,7 @@ export const MatrixCanvas: React.FC<MatrixCanvasProps> = ({ input }) => {
       const isPixelRow = row.split('').every(char => char === '0' || char === '1' || char === '\n');
       
       if (isPixelRow) {
-        [...row].forEach((char, x) => {
+        Array.from(row).forEach((char, x) => {
           ctx.fillStyle = char === '1' ? 'black' : 'white';
           ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
           ctx.strokeStyle = 'gray';

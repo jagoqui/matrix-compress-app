@@ -21,3 +21,15 @@ export const CODEBOOK: { [p: string]: string } = {
 export const REVERSE_CODEBOOK = Object.fromEntries(
   Object.entries(CODEBOOK).map(([key, value]) => [value, key])
 );
+
+// Mapeo de teclas a íconos
+export const KEY_TO_ICON: { [key: string]: string } = {
+  'a': '🔴',
+  'w': '🟢',
+  'd': '🔵',
+  's': '⚪',
+  'j': '🔴',
+  'i': '🟢',
+  'l': '🔵',
+  'k': '⚪'
+};

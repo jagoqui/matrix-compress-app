@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { MatrixCanvas } from './MatrixCanvas';
 import { useCompressor } from '../hooks/useCompressor';
-import { CODEBOOK } from '../constants/constants';
+import { CODEBOOK, KEY_TO_ICON } from '../constants/constants';
 
 export const CompressApp: React.FC = () => {
   const { 
@@ -38,6 +38,15 @@ export const CompressApp: React.FC = () => {
     navigator.clipboard.writeText(mode === 'compress' ? output : input).then(() => {
       setShowCopyModal(true);
     });
+  };
+
+  // Función para transformar el objeto KEY_TO_ICON en formato JSON con claves en mayúsculas
+  const formatKeyToIcon = (keyToIcon: { [key: string]: string }) => {
+    const formattedEntries = Object.entries(keyToIcon).map(([key, value]) => [
+      key.toUpperCase(), 
+      value
+    ]);
+    return Object.fromEntries(formattedEntries);
   };
 
   return (
@@ -95,6 +104,16 @@ export const CompressApp: React.FC = () => {
               className="mb-4 font-mono text-lg h-40"
             />
           )}
+          {
+            mode === 'decompress'  && (
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">Mapeo de Teclas a Íconos:</h3>
+                <pre className="bg-gray-100 p-2 rounded">
+                  {JSON.stringify(formatKeyToIcon(KEY_TO_ICON), null, 2)}
+                </pre>
+              </div>
+            ) 
+          }
           <div className="mb-4">
             <h3 className="text-lg font-semibold mb-2">Visualización de Matriz de Entrada:</h3>
             <MatrixCanvas input={mode === 'compress' ? input : output} />

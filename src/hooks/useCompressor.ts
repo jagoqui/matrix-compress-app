@@ -1,5 +1,5 @@
 import { useState, useEffect, KeyboardEvent } from 'react';
-import { CODEBOOK, REVERSE_CODEBOOK } from '../constants/constants';
+import { ALLOWED_ICONS_REGEX, CLEANED_ICONS_REGEX, CODEBOOK, IconsKeys, KEY_TO_ICON, REVERSE_CODEBOOK } from '../constants/constants';
 
 type Mode = 'compress' | 'decompress';
 type InputMode = 'serial' | 'parallel';
@@ -7,7 +7,17 @@ type InputMode = 'serial' | 'parallel';
 export const useCompressor = (initialMode: Mode = 'compress') => {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [inputMode, setInputMode] = useState<InputMode>('serial');
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(`da705901ab9d
+01111110
+11011011
+11111111
+00111100
+11011011
+01100110
+00111100
+01111110
+11111111
+11011011`);
   const [parallelInput, setParallelInput] = useState(['', '']);
   const [output, setOutput] = useState('');
   const [charCount, setCharCount] = useState({ before: 0, after: 0 });
@@ -37,13 +47,12 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       return trailingZerosB - trailingZerosA; // Ordenar de mayor a menor
     });
   
-    // Identificar la fila binarioa con la menor cantidad de ceros al final (última en el orden)
+    // Identificar la fila binaria con la menor cantidad de ceros al final (última en el orden)
     const minTrailingZeroRow = sortedRows[sortedRows.length - 1] ?? null;
   
     return rows
       .map(row => {
-        const currentRowIsBinary = binaryRows.some((binRow) => binRow === binRow);
-  
+        const currentRowIsBinary = binaryRows.some((binRow) => binRow === row);
         if (currentRowIsBinary) {
           // Eliminar ceros consecutivos al final en todas las filas, excepto en la fila con la mínima cantidad de ceros al final
           const rowToEncode = row === minTrailingZeroRow 
@@ -54,83 +63,78 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
             .split('')
             .map(char => CODEBOOK[char.toUpperCase()] || char)
             .join('');
-        } else {
-          // Codificar la fila con \n entre caracteres
-          let encodedRow = row
+        } else{
+          const encodedRow = row
             .split('')
             .map(char => CODEBOOK[char.toUpperCase()] || char)
-            .join('\n');
-  
-          // Verificar si la fila original termina en \n y conservarlo al final
-          if (row.endsWith('\n')) {
-            return encodedRow + '\n';
-          } else {
-            // Eliminar los \n intermedios dejando solo el último si existe
-            return encodedRow.replace(/\n/g, '');
-          }
+            .join(CODEBOOK['|']); //Agrega separador a los caracteres
+          return encodedRow;
         }
       })
-      .join('\n');
+      .join(CODEBOOK['\n']);
   };
   
   const decompress = (text: string) => {
+    // Verificar si el texto contiene solo los caracteres permitidos
+    if (!ALLOWED_ICONS_REGEX.test(text)) {
+        return ''; // Retornar si se encuentra un carácter no permitido
+    }
+
     let result = '';
-    let buffer = '';
-    
-    // Descompresión del texto usando REVERSE_CODEBOOK
-    for (let char of text) {
-      if (char === '\n') {
-        // Si encontramos un salto de línea, procesamos lo que haya en el buffer
-        if (buffer) {
-          result += REVERSE_CODEBOOK[buffer] || buffer;
-          buffer = '';
+    const rows = text.split(CODEBOOK['\n']); // Separar las filas usando CODEBOOK['\n']
+
+    // Identificar y procesar filas de letras y filas binarias
+    rows.forEach((row, index) => {
+        if (row.includes(CODEBOOK['|'])) {
+            // Fila de letras
+            const charCodes = row.split(CODEBOOK['|']);
+            let decodedRow = charCodes.map(code => REVERSE_CODEBOOK[code] || code).join('');
+            if (index < rows.length - 1) {
+                // Si no es la última fila, agregar \n
+                decodedRow += '\n';
+            }
+            result += decodedRow;
+        } else {
+            // Fila binaria, decodificar símbolo a símbolo
+            for (let char of row) {
+                result += REVERSE_CODEBOOK[char] || char;
+            }
+            result += '\n'; // Agregar \n después de cada fila binaria
         }
-        result += '\n'; // Añadimos el salto de línea al resultado
-      } else {
-        buffer += char;
-        if (REVERSE_CODEBOOK[buffer]) {
-          result += REVERSE_CODEBOOK[buffer];
-          buffer = '';
-        }
-      }
-    }
-    
-    // Procesar cualquier código residual en el buffer
-    if (buffer) {
-      result += REVERSE_CODEBOOK[buffer] || buffer;
-    }
-  
-    // Dividir el resultado en filas
-    const rows = result.split('\n');
-    
+    });
+
+    // Dividir el resultado en filas para aplicar padding a las filas binarias
+    const resultRows = result.split('\n');
+
     // Filtrar filas binarias
-    const binaryRows = rows.filter(row => /^[01]+$/.test(row));
-  
+    const binaryRows = resultRows.filter(row => /^[01]+$/.test(row));
+
     // Encontrar la longitud máxima de fila binaria
     const maxBinaryRowLength = binaryRows.reduce((max, row) => Math.max(max, row.length), 0);
-  
+
     // Normalizar tamaño de las filas binarias con padding
-    const normalizedBinaryRows = binaryRows.map(row => 
-      row.length < maxBinaryRowLength 
-        ? row.padEnd(maxBinaryRowLength, '0') 
-        : row
+    const normalizedBinaryRows = binaryRows.map(row =>
+        row.length < maxBinaryRowLength
+            ? row.padEnd(maxBinaryRowLength, '0')
+            : row
     );
-  
+
     // Reensamblar el texto con filas normalizadas
     let normalizedResult = '';
     let binaryRowIndex = 0;
-  
-    for (let row of rows) {
-      if (/^[01]+$/.test(row)) {
-        normalizedResult += normalizedBinaryRows[binaryRowIndex] + '\n';
-        binaryRowIndex++;
-      } else {
-        normalizedResult += row + '\n';
-      }
+
+    for (let row of resultRows) {
+        if (/^[01]+$/.test(row)) {
+            normalizedResult += normalizedBinaryRows[binaryRowIndex] + '\n';
+            binaryRowIndex++;
+        } else {
+            normalizedResult += row + '\n';
+        }
     }
-  
+
     return normalizedResult.trim(); // Elimina el último salto de línea extra
   };
+
   
   // TODO: Extraer codigo aparte
   const processInput = (text: string) => {
@@ -155,7 +159,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       const sanitizedValue = value.replace(/[^0-9A-Fa-f\n]/g, '').toUpperCase();
       setInput(sanitizedValue);
     } else {
-      const sanitizedValue = value.replace(/[^🔴🟢🔵⚪\n]/g, '');
+      const sanitizedValue = value.replace(CLEANED_ICONS_REGEX, '');
       if (inputMode === 'serial') {
         setInput(sanitizedValue);
       } else if (index !== undefined) {
@@ -171,17 +175,9 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>, index?: number) => {
     if (mode === 'decompress') {
       const key = e.key.toLowerCase();
-      let icon = '';
-      switch (key) {
-        case 'a': icon = '🔴'; break;
-        case 'w': icon = '🟢'; break;
-        case 'd': icon = '🔵'; break;
-        case 's': icon = '⚪'; break;
-        case 'j': icon = '🔴'; break;
-        case 'i': icon = '🟢'; break;
-        case 'l': icon = '🔵'; break;
-        case 'k': icon = '⚪'; break;
-        default: return;
+      const icon = KEY_TO_ICON[key as IconsKeys] ?? null;
+      if(!icon){
+        return; 
       }
       e.preventDefault();
 

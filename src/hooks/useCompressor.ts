@@ -74,8 +74,6 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       .join('\n');
   };
   
-  
-
   const decompress = (text: string) => {
     let result = '';
     let buffer = '';

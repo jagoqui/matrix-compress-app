@@ -7,6 +7,8 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Matrix compressor",
   description: "Matrix compress/decompress for system light communication.",
+  category: "website",
+  generator: "Next.js", // framework used
   manifest: "/manifest.json",
   icons:{
     apple: "/icon.png"

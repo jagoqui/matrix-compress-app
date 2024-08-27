@@ -27,18 +27,59 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   };
 
   const compress = (text: string) => {
-    return text.split('').map((char: string) => CODEBOOK[char.toUpperCase()] || char).join('');
+    return text
+      .split('\n')
+      .map(row => {
+        // Verificar si la fila contiene solo '0', '1' o '\n'
+        const containsOnlyBinary = row.split('').every(char => char === '0' || char === '1' || char === '\n');
+
+        if (containsOnlyBinary) {
+          // Codificar la fila sin agregar \n entre caracteres
+          return row
+            .split('')
+            .map(char => CODEBOOK[char.toUpperCase()] || char)
+            .join('');
+        } else {
+          // Codificar la fila con \n entre caracteres
+          let encodedRow = row
+            .split('')
+            .map(char => CODEBOOK[char.toUpperCase()] || char)
+            .join('\n');
+
+          // Verificar si la fila original termina en \n y conservarlo al final
+          if (row.endsWith('\n')) {
+            return encodedRow + '\n';
+          } else {
+            // Eliminar los \n intermedios dejando solo el último si existe
+            return encodedRow.replace(/\n/g, '');
+          }
+        }
+      })
+      .join('\n');
   };
 
   const decompress = (text: string) => {
     let result = '';
     let buffer = '';
     for (let char of text) {
-      buffer += char;
-      if (REVERSE_CODEBOOK[buffer]) {
-        result += REVERSE_CODEBOOK[buffer];
-        buffer = '';
+      if (char === '\n') {
+        // Si encontramos un salto de línea, procesamos lo que haya en el buffer
+        if (buffer) {
+          result += REVERSE_CODEBOOK[buffer] || buffer;
+          buffer = '';
+        }
+        result += '\n'; // Añadimos el salto de línea al resultado
+      } else {
+        buffer += char;
+        if (REVERSE_CODEBOOK[buffer]) {
+          result += REVERSE_CODEBOOK[buffer];
+          buffer = '';
+        }
       }
+    }
+    // Procesar cualquier código residual en el buffer
+    if (buffer) {
+      result += REVERSE_CODEBOOK[buffer] || buffer;
     }
     return result;
   };
@@ -65,7 +106,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       const sanitizedValue = value.replace(/[^0-9A-Fa-f\n]/g, '').toUpperCase();
       setInput(sanitizedValue);
     } else {
-      const sanitizedValue = value.replace(/[^🔴🟢🔵⚪]/g, '');
+      const sanitizedValue = value.replace(/[^🔴🟢🔵⚪\n]/g, '');
       if (inputMode === 'serial') {
         setInput(sanitizedValue);
       } else if (index !== undefined) {

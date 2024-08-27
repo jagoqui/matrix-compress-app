@@ -59,7 +59,7 @@ export const CLEANED_ICONS_REGEX = buildCleanedIconsRegex(CODEBOOK);
 
 // Mapeo de teclas a íconos
 // Definición de tipo para las teclas
-export type IconsKeys = 'a' | 'w' | 'd' | 's' | 'j' | 'i' | 'l' | 'k' | 'e' | 'p' | 'q' | 'r';
+export type IconsKeys = 'a' | 'w' | 'd' | 's' | 'j' | 'i' | 'l' | 'k' | 'e' | 'q'| 'u' | 'o';
 
 // Mapeo simbólico de teclas a íconos
 const KEY_GROUPS: Record<Icon, IconsKeys[]> = {
@@ -68,7 +68,7 @@ const KEY_GROUPS: Record<Icon, IconsKeys[]> = {
   '🔵': ['d', 'l'],
   '⚪': ['s', 'k'],
   '💡': ['q', 'i'],
-  '🚦': ['e', 'p']
+  '🚦': ['e', 'o']
 };
 
 // Inicializar el mapeo de teclas a íconos con Partial para evitar el error inicial

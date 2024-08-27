@@ -79,14 +79,14 @@ export const CompressApp: React.FC = () => {
           {mode === 'decompress' && inputMode === 'parallel' ? (
             <div className="flex space-x-2 mb-4">
               <Textarea
-                placeholder="Parte inicial (a, w, d, s)"
+                placeholder="Parte inicial presione las teclas de la izquierda."
                 value={parallelInput[0]}
                 onChange={(e) => handleInputChange(e.target.value, 0)}
                 onKeyPress={(e) => handleKeyPress(e)}
                 className="mb-4 font-mono text-lg h-40 w-1/2"
               />
               <Textarea
-                placeholder="Parte final (j, i, l, k)"
+                placeholder="Parte final, presione las teclas de la derecha"
                 value={parallelInput[1]}
                 onChange={(e) => handleInputChange(e.target.value, 1)}
                 onKeyPress={(e) => handleKeyPress(e)}

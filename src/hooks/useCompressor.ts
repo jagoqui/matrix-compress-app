@@ -1,5 +1,5 @@
 import { useState, useEffect, KeyboardEvent } from 'react';
-import { ALLOWED_ICONS_REGEX, CLEANED_ICONS_REGEX, CODEBOOK, IconsKeys, KEY_TO_ICON, REVERSE_CODEBOOK } from '../constants/constants';
+import { ALLOWED_ICONS_REGEX, CLEANED_ICONS_REGEX, CODEBOOK, IconsKeys, KEY_TO_ICON, LEFT_ICONS_KEYS_ARRAY, LeftIconsKeys, REVERSE_CODEBOOK, RIGHT_ICONS_KEYS_ARRAY, RightIconsKeys } from '../constants/constants';
 
 type Mode = 'compress' | 'decompress';
 type InputMode = 'serial' | 'parallel';
@@ -39,23 +39,21 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   const compress = (text: string) => {
     const rows = text.split('\n');
   
-    const binaryRows = rows.filter(row => /^[01\n]+$/.test(row));
-    // Ordenar las filas según la cantidad de ceros al final, de mayor a menor
-    const sortedRows = [...binaryRows].sort((a, b) => {
-      const trailingZerosA = (a.match(/0+$/) || [''])[0].length;
-      const trailingZerosB = (b.match(/0+$/) || [''])[0].length;
-      return trailingZerosB - trailingZerosA; // Ordenar de mayor a menor
-    });
-  
-    // Identificar la fila binaria con la menor cantidad de ceros al final (última en el orden)
-    const minTrailingZeroRow = sortedRows[sortedRows.length - 1] ?? null;
+     // Filtrar las filas binarias
+     const binaryRows = rows.filter(row => /^[01\n]+$/.test(row));
+    
+     // Identificar la fila binaria con más columnas (más caracteres)
+     const maxColumnRow = binaryRows.reduce((maxRow, currentRow) => 
+         currentRow.length > (maxRow?.length ?? 0) ? currentRow : maxRow, 
+         ''
+     );
   
     return rows
       .map(row => {
         const currentRowIsBinary = binaryRows.some((binRow) => binRow === row);
         if (currentRowIsBinary) {
           // Eliminar ceros consecutivos al final en todas las filas, excepto en la fila con la mínima cantidad de ceros al final
-          const rowToEncode = row === minTrailingZeroRow 
+          const rowToEncode = row === maxColumnRow 
             ? row 
             : row.replace(/0+$/, '');
   
@@ -186,9 +184,9 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       } else {
         setParallelInput(prev => {
           const newInput = [...prev];
-          if (['a', 'w', 'd', 's'].includes(key)) {
+          if (LEFT_ICONS_KEYS_ARRAY.includes(key as LeftIconsKeys)) {
             newInput[0] += icon;
-          } else if (['j', 'i', 'l', 'k'].includes(key)) {
+          } else if (RIGHT_ICONS_KEYS_ARRAY.includes(key as RightIconsKeys)) {
             newInput[1] += icon;
           }
           return newInput;

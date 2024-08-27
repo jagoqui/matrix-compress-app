@@ -59,8 +59,11 @@ export const CLEANED_ICONS_REGEX = buildCleanedIconsRegex(CODEBOOK);
 
 // Mapeo de teclas a íconos
 // Definición de tipo para las teclas
-type LeftIconsKeys = 'a' | 'q' | 'w' | 's' | 'e' | 'd';
-type RightIconsKeys = 'k' | 'i' | 'o' | 'l' | 'p'| 'ñ';
+export type LeftIconsKeys = 'a' | 'q' | 'w' | 's' | 'e' | 'd';
+export type RightIconsKeys = 'k' | 'i' | 'o' | 'l' | 'p'| 'ñ';
+// Definición de arrays de teclas
+export const LEFT_ICONS_KEYS_ARRAY: ReadonlyArray<LeftIconsKeys> = ['a', 'q', 'w', 's', 'e', 'd'];
+export const RIGHT_ICONS_KEYS_ARRAY: ReadonlyArray<RightIconsKeys> = ['k', 'i', 'o', 'l', 'p', 'ñ'];
 export type IconsKeys = LeftIconsKeys | RightIconsKeys;
 
 // Mapeo simbólico de teclas a íconos

@@ -22,13 +22,10 @@ export const CompressApp: React.FC = () => {
     inputMode, 
     setInputMode,
     input, 
-    setInput, 
     parallelInput,
-    setParallelInput,
     output, 
     charCount, 
     handleReset, 
-    processInput,
     handleInputChange,
     handleKeyPress
   } = useCompressor();
@@ -84,14 +81,14 @@ export const CompressApp: React.FC = () => {
                 placeholder="Parte inicial (a, w, d, s)"
                 value={parallelInput[0]}
                 onChange={(e) => handleInputChange(e.target.value, 0)}
-                onKeyPress={(e) => handleKeyPress(e, 0)}
+                onKeyPress={(e) => handleKeyPress(e)}
                 className="mb-4 font-mono text-lg h-40 w-1/2"
               />
               <Textarea
                 placeholder="Parte final (j, i, l, k)"
                 value={parallelInput[1]}
                 onChange={(e) => handleInputChange(e.target.value, 1)}
-                onKeyPress={(e) => handleKeyPress(e, 1)}
+                onKeyPress={(e) => handleKeyPress(e)}
                 className="mb-4 font-mono text-lg h-40 w-1/2"
               />
             </div>

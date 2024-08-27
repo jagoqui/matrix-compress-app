@@ -1,6 +1,5 @@
 import { useState, useEffect, KeyboardEvent } from 'react';
 import { CODEBOOK, REVERSE_CODEBOOK } from '../constants/constants';
-import { handleInputChange, handleKeyPress } from '../utils/useCompressorHandlers';
 
 type Mode = 'compress' | 'decompress';
 type InputMode = 'serial' | 'parallel';
@@ -133,7 +132,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
     return normalizedResult.trim(); // Elimina el último salto de línea extra
   };
   
-  
+  // TODO: Extraer codigo aparte
   const processInput = (text: string) => {
     const processedOutput = mode === 'compress' ? compress(text) : decompress(text);
     setOutput(processedOutput);
@@ -151,6 +150,63 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
     localStorage.removeItem(mode);
   };
 
+  const handleInputChange = (value: string, index?: number) => {
+    if (mode === 'compress') {
+      const sanitizedValue = value.replace(/[^0-9A-Fa-f\n]/g, '').toUpperCase();
+      setInput(sanitizedValue);
+    } else {
+      const sanitizedValue = value.replace(/[^🔴🟢🔵⚪\n]/g, '');
+      if (inputMode === 'serial') {
+        setInput(sanitizedValue);
+      } else if (index !== undefined) {
+        setParallelInput(prev => {
+          const newInput = [...prev];
+          newInput[index] = sanitizedValue;
+          return newInput;
+        });
+      }
+    }
+  };
+
+  const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>, index?: number) => {
+    if (mode === 'decompress') {
+      const key = e.key.toLowerCase();
+      let icon = '';
+      switch (key) {
+        case 'a': icon = '🔴'; break;
+        case 'w': icon = '🟢'; break;
+        case 'd': icon = '🔵'; break;
+        case 's': icon = '⚪'; break;
+        case 'j': icon = '🔴'; break;
+        case 'i': icon = '🟢'; break;
+        case 'l': icon = '🔵'; break;
+        case 'k': icon = '⚪'; break;
+        default: return;
+      }
+      e.preventDefault();
+
+      if (inputMode === 'serial') {
+        setInput(prev => prev + icon);
+      } else {
+        setParallelInput(prev => {
+          const newInput = [...prev];
+          if (['a', 'w', 'd', 's'].includes(key)) {
+            newInput[0] += icon;
+          } else if (['j', 'i', 'l', 'k'].includes(key)) {
+            newInput[1] += icon;
+          }
+          return newInput;
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (inputMode === 'parallel') {
+      setInput(parallelInput[0] + parallelInput[1]);
+    }
+  }, [parallelInput, inputMode]);
+
   return {
     mode,
     setMode,
@@ -164,7 +220,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
     charCount,
     handleReset,
     processInput,
-    handleInputChange: (value: string, index?: number) => handleInputChange(mode, inputMode, value, index, setInput, setParallelInput),
-    handleKeyPress: (e: KeyboardEvent<HTMLTextAreaElement>, index?: number) => handleKeyPress(mode, inputMode, e, setInput, setParallelInput)
+    handleInputChange,
+    handleKeyPress
   };
 };

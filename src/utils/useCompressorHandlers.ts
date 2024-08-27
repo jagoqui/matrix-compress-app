@@ -4,6 +4,7 @@ import { KeyboardEvent } from 'react';
 type Mode = 'compress' | 'decompress';
 type InputMode = 'serial' | 'parallel';
 
+// TODO: Está fallando cuando lo extraigo, revisar
 export const handleInputChange = (
   mode: Mode, 
   inputMode: InputMode, 

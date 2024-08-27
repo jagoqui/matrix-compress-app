@@ -14,6 +14,7 @@ import {
 import { MatrixCanvas } from './MatrixCanvas';
 import { useCompressor } from '../hooks/useCompressor';
 import { CODEBOOK, KEY_TO_ICON } from '../constants/constants';
+import KeyBoardPressViewer from './KeyboardPressViewer';
 
 export const CompressApp: React.FC = () => {
   const { 
@@ -103,12 +104,7 @@ export const CompressApp: React.FC = () => {
           )}
           {
             mode === 'decompress'  && (
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold mb-2">Mapeo de Teclas a Íconos:</h3>
-                <pre className="bg-gray-100 p-2 rounded">
-                  {JSON.stringify(formatKeyToIcon(KEY_TO_ICON), null, 2)}
-                </pre>
-              </div>
+              <KeyBoardPressViewer/>
             ) 
           }
           <div className="mb-4">

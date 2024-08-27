@@ -79,6 +79,8 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   const decompress = (text: string) => {
     let result = '';
     let buffer = '';
+    
+    // Descompresión del texto usando REVERSE_CODEBOOK
     for (let char of text) {
       if (char === '\n') {
         // Si encontramos un salto de línea, procesamos lo que haya en el buffer
@@ -95,13 +97,45 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
         }
       }
     }
+    
     // Procesar cualquier código residual en el buffer
     if (buffer) {
       result += REVERSE_CODEBOOK[buffer] || buffer;
     }
-    return result;
+  
+    // Dividir el resultado en filas
+    const rows = result.split('\n');
+    
+    // Filtrar filas binarias
+    const binaryRows = rows.filter(row => /^[01]+$/.test(row));
+  
+    // Encontrar la longitud máxima de fila binaria
+    const maxBinaryRowLength = binaryRows.reduce((max, row) => Math.max(max, row.length), 0);
+  
+    // Normalizar tamaño de las filas binarias con padding
+    const normalizedBinaryRows = binaryRows.map(row => 
+      row.length < maxBinaryRowLength 
+        ? row.padEnd(maxBinaryRowLength, '0') 
+        : row
+    );
+  
+    // Reensamblar el texto con filas normalizadas
+    let normalizedResult = '';
+    let binaryRowIndex = 0;
+  
+    for (let row of rows) {
+      if (/^[01]+$/.test(row)) {
+        normalizedResult += normalizedBinaryRows[binaryRowIndex] + '\n';
+        binaryRowIndex++;
+      } else {
+        normalizedResult += row + '\n';
+      }
+    }
+  
+    return normalizedResult.trim(); // Elimina el último salto de línea extra
   };
-
+  
+  
   const processInput = (text: string) => {
     const processedOutput = mode === 'compress' ? compress(text) : decompress(text);
     setOutput(processedOutput);

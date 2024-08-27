@@ -28,15 +28,30 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   };
 
   const compress = (text: string) => {
-    return text
-      .split('\n')
+    const rows = text.split('\n');
+  
+    const binaryRows = rows.filter(row => /^[01\n]+$/.test(row));
+    // Ordenar las filas según la cantidad de ceros al final, de mayor a menor
+    const sortedRows = [...binaryRows].sort((a, b) => {
+      const trailingZerosA = (a.match(/0+$/) || [''])[0].length;
+      const trailingZerosB = (b.match(/0+$/) || [''])[0].length;
+      return trailingZerosB - trailingZerosA; // Ordenar de mayor a menor
+    });
+  
+    // Identificar la fila binarioa con la menor cantidad de ceros al final (última en el orden)
+    const minTrailingZeroRow = sortedRows[sortedRows.length - 1] ?? null;
+  
+    return rows
       .map(row => {
-        // Verificar si la fila contiene solo '0', '1' o '\n'
-        const containsOnlyBinary = row.split('').every(char => char === '0' || char === '1' || char === '\n');
-
-        if (containsOnlyBinary) {
-          // Codificar la fila sin agregar \n entre caracteres
-          return row
+        const currentRowIsBinary = binaryRows.some((binRow) => binRow === binRow);
+  
+        if (currentRowIsBinary) {
+          // Eliminar ceros consecutivos al final en todas las filas, excepto en la fila con la mínima cantidad de ceros al final
+          const rowToEncode = row === minTrailingZeroRow 
+            ? row 
+            : row.replace(/0+$/, '');
+  
+          return rowToEncode
             .split('')
             .map(char => CODEBOOK[char.toUpperCase()] || char)
             .join('');
@@ -46,7 +61,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
             .split('')
             .map(char => CODEBOOK[char.toUpperCase()] || char)
             .join('\n');
-
+  
           // Verificar si la fila original termina en \n y conservarlo al final
           if (row.endsWith('\n')) {
             return encodedRow + '\n';
@@ -58,6 +73,8 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       })
       .join('\n');
   };
+  
+  
 
   const decompress = (text: string) => {
     let result = '';

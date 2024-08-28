@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCompressor } from '../hooks/useCompressor';
 import { SwitchWithLabel } from './SwitchWithLabel';
-import { TextArea } from './TextArea';
+import { CustomTextArea } from './CustomTextArea';
 import { CopyableOutput } from './CopyableOutput';
 import { CodebookDisplay } from './CodebookDisplay';
 import KeyBoardPressViewer from './KeyboardPressViewer';
@@ -75,14 +75,14 @@ export const CompressApp: React.FC = () => {
           )}
           {mode === 'decompress' && inputMode === 'parallel' ? (
             <div className="flex space-x-2 mb-4">
-              <TextArea
+              <CustomTextArea
                 placeholder="Parte inicial presione las teclas de la izquierda."
                 value={parallelInput[0]}
                 onChange={(value: string) => handleInputChange(value, 0)}
                 onKeyPress={handleKeyPress}
                 className="w-1/2"
               />
-              <TextArea
+              <CustomTextArea
                 placeholder="Parte final, presione las teclas de la derecha"
                 value={parallelInput[1]}
                 onChange={(value: string) => handleInputChange(value, 1)}
@@ -91,7 +91,7 @@ export const CompressApp: React.FC = () => {
               />
             </div>
           ) : (
-            <TextArea
+            <CustomTextArea
               placeholder={mode === 'compress' ? "Ingrese el texto a comprimir" : "Ingrese el texto codificado a descomprimir"}
               value={input}
               onChange={handleInputChange}

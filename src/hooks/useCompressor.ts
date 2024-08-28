@@ -1,7 +1,7 @@
 import { useState, useEffect, KeyboardEvent } from 'react';
 import { ALLOWED_ICONS_REGEX, CLEANED_ICONS_REGEX, CODEBOOK, IconsKeys, KEY_TO_ICON, LEFT_ICONS_KEYS_ARRAY, LeftIconsKeys, REVERSE_CODEBOOK, RIGHT_ICONS_KEYS_ARRAY, RightIconsKeys } from '../constants/constants';
+import { Mode } from '@/models/commons.models';
 
-type Mode = 'compress' | 'decompress';
 type InputMode = 'serial' | 'parallel';
 
 export const useCompressor = (initialMode: Mode = 'compress') => {

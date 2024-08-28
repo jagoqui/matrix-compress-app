@@ -14,7 +14,7 @@ export const MatrixCanvas: React.FC<MatrixCanvasProps> = ({ input }) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const cellSize = 25; // Increased cell size
+    const cellSize = 30; // Increased cell size
     const rows = input.split('\n');
     const maxWidth = Math.max(...rows.map(row => row.length));
 
@@ -36,7 +36,7 @@ export const MatrixCanvas: React.FC<MatrixCanvasProps> = ({ input }) => {
         });
       } else {
         ctx.fillStyle = 'black';
-        ctx.font = '16px monospace'; // Increased font size and changed to monospace
+        ctx.font = '24px monospace'; // Increased font size and changed to monospace
         ctx.fillText(row, 5, y * cellSize + 18);
       }
     });

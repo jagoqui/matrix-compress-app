@@ -1,51 +1,66 @@
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+import React, { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import { MatrixCanvas } from './MatrixCanvas';
 import { useCompressor } from '../hooks/useCompressor';
-import { CODEBOOK, KEY_TO_ICON } from '../constants/constants';
+import { CODEBOOK, Icon, ICON_TO_LETTER_MAP } from '../constants/constants';
 import KeyBoardPressViewer from './KeyboardPressViewer';
 
 export const CompressApp: React.FC = () => {
-  const { 
-    mode, 
-    setMode, 
-    inputMode, 
+  const {
+    mode,
+    setMode,
+    inputMode,
     setInputMode,
-    input, 
+    input,
     parallelInput,
-    output, 
-    charCount, 
-    handleReset, 
+    output,
+    charCount,
+    handleReset,
     handleInputChange,
     handleKeyPress
   } = useCompressor();
+  
   const [showCopyModal, setShowCopyModal] = useState(false);
+  const [copyMessage, setCopyMessage] = useState('');
+  const [letterCodebookOutput, setLetterCodebookOutput] = useState('');
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(mode === 'compress' ? output : input).then(() => {
+  const handleCopy = (textToCopy: string, message: string) => {
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      setCopyMessage(message);
       setShowCopyModal(true);
     });
   };
 
-  // Función para transformar el objeto KEY_TO_ICON en formato JSON con claves en mayúsculas
-  const formatKeyToIcon = (keyToIcon: { [key: string]: string }) => {
-    const formattedEntries = Object.entries(keyToIcon).map(([key, value]) => [
-      key.toUpperCase(), 
-      value
-    ]);
-    return Object.fromEntries(formattedEntries);
+  // Función para transformar el output usando LETTER_CODEBOOK
+  const transformOutputToLetterCodebook = (text: string): string => {
+    const iconRegex = /\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu; // Expresión regular para encontrar íconos
+    const icons = text.match(iconRegex) || []; // Obtener todos los íconos en el texto
+    
+    return icons.map(icon => {
+      const letter = ICON_TO_LETTER_MAP[icon as Icon] || icon; // Mapear el ícono a su letra correspondiente
+      return letter;
+    }).join('');
   };
+
+  // useEffect para actualizar el estado de letterCodebookOutput cuando output cambia
+  useEffect(() => {
+    if(!output){
+      return;
+    }
+    const transformedOutput = transformOutputToLetterCodebook(output);
+    setLetterCodebookOutput(transformedOutput);
+  }, [output]);
 
   return (
     <div className="container mx-auto p-4">
@@ -103,41 +118,68 @@ export const CompressApp: React.FC = () => {
             />
           )}
           {
-            mode === 'decompress'  && (
-              <KeyBoardPressViewer/>
-            ) 
+            mode === 'decompress' && (
+              <KeyBoardPressViewer />
+            )
           }
           <div className="mb-4">
             <h3 className="text-lg font-semibold mb-2">Visualización de Matriz de Entrada:</h3>
             <MatrixCanvas input={mode === 'compress' ? input : output} />
           </div>
-          <div className="flex space-x-2 mb-4">
-            <Button onClick={handleReset}>Reiniciar</Button>
-            <Button onClick={handleCopy}>Copiar {mode === 'compress' ? 'Salida Codificada' : 'Entrada Codificada'}</Button>
+
+          {/* Salida usando CODEBOOK */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2">Salida usando CODEBOOK (Íconos):</h3>
+            <Textarea
+              value={output}
+              readOnly
+              className="mb-4 font-mono text-lg h-40 whitespace-pre-wrap cursor-text"
+            />
+            <Button onClick={() => handleCopy(output, 'Salida con CODEBOOK copiada al portapapeles')}>
+              Copiar Salida Descompresor
+            </Button>
           </div>
-          <Textarea
-            value={output}
-            readOnly
-            className="mb-4 font-mono text-lg h-40 whitespace-pre-wrap cursor-text"
-          />
+
+          {/* Salida usando LETTER_CODEBOOK */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2">Salida usando LETTER_CODEBOOK (Letras):</h3>
+            <Textarea
+              value={letterCodebookOutput}
+              readOnly
+              className="mb-4 font-mono text-lg h-40 whitespace-pre-wrap cursor-text"
+            />
+            <Button onClick={() => handleCopy(letterCodebookOutput, 'Salida para ARDUINO copiada al portapapeles')}>
+              Copiar Salida Para ARDUINO
+            </Button>
+          </div>
+
           <div className="mb-4">
             <p>Caracteres antes: {charCount.before}</p>
             <p>Caracteres después: {charCount.after}</p>
           </div>
+
+          {/* Mostrar ambos Codebooks */}
           <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">Codebook:</h3>
+            <h3 className="text-lg font-semibold mb-2">Codebook Descompresor:</h3>
             <pre className="bg-gray-100 p-2 rounded">
               {JSON.stringify(CODEBOOK, null, 2)}
             </pre>
           </div>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2">Codebook ARDUINO:</h3>
+            <pre className="bg-gray-100 p-2 rounded">
+              {JSON.stringify(ICON_TO_LETTER_MAP, null, 2)}
+            </pre>
+          </div>
         </CardContent>
       </Card>
+
       <Dialog open={showCopyModal} onOpenChange={setShowCopyModal}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Copiado al portapapeles</DialogTitle>
             <DialogDescription>
-              {mode === 'compress' ? 'La salida codificada' : 'La entrada codificada'} ha sido copiada al portapapeles.
+              {copyMessage}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

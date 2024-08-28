@@ -1,5 +1,5 @@
 
-type Icon = '🔴' | '🟢' | '🔵' | '⚪' | '🚦' | '💡';
+export type Icon = '🔴' | '🟢' | '🔵' | '⚪' | '🚦' | '💡';
 
 export const CODEBOOK: { [p: string]: Icon | `${Icon}${Icon}` } = {
   "0": "🔴",
@@ -25,6 +25,16 @@ export const CODEBOOK: { [p: string]: Icon | `${Icon}${Icon}` } = {
 export const REVERSE_CODEBOOK = Object.fromEntries(
   Object.entries(CODEBOOK).map(([key, value]) => [value, key])
 );
+
+// Define the icon-to-letter mapping
+export const ICON_TO_LETTER_MAP: { [key in Icon]: string } = {
+  "🔴": "R",
+  "🟢": "G",
+  "🔵": "V",
+  "⚪": "W",
+  "🚦": "Y",
+  "💡": "X"
+};
 
 // Función para extraer íconos únicos del CODEBOOK
 function getUniqueIcons(codebook: { [key: string]: string }): string[] {

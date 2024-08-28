@@ -9,12 +9,14 @@ import { CodebookDisplay } from './CodebookDisplay';
 import KeyBoardPressViewer from './KeyboardPressViewer';
 import { Icon, ICON_TO_LETTER_MAP } from '@/constants/constants';
 import { MatrixVisualization } from './MatrixVisualization';
+import { Button } from './ui/button';
 
 export const CompressApp: React.FC = () => {
   const {
     mode,
     setMode,
     inputMode,
+    handleReset,
     setInputMode,
     input,
     parallelInput,
@@ -96,6 +98,7 @@ export const CompressApp: React.FC = () => {
               onKeyPress={handleKeyPress}
             />
           )}
+          <Button onClick={handleReset}>Reset</Button>
           {mode === 'decompress' && <KeyBoardPressViewer />}
           <MatrixVisualization mode={mode} input={input} output={output} /><br/>
           <CopyableOutput title="CodeBook Arduino" content={letterCodebookOutput} onCopy={(text) => handleCopy(text, 'CodeBook para el Arduino copiado')} />

@@ -19,7 +19,7 @@ type InputMode = 'serial' | 'parallel';
 export const useCompressor = (initialMode: Mode = 'compress') => {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [inputMode, setInputMode] = useState<InputMode>('serial');
-  const [input, setInput] = useState(`da705901ab9d
+  const [input, setInput] = useState(`DA705901AB9D
 01111110
 11011011
 11111111
@@ -54,15 +54,31 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   const compress = (text: string) => {
     const rows = text.split(BREAK_LINE);
     const binaryRows = rows.filter(row => /^[01\n]+$/.test(row));
-    const maxColumnRow = binaryRows.reduce(
-      (maxRow, currentRow) => (currentRow.length > (maxRow?.length ?? 0) ? currentRow : maxRow), 
-      ''
-    );
+    // Encuentra la fila con el máximo número de columnas, en caso de empate, con menos ceros al final
+    const maxColumnRow = binaryRows.reduce((maxRow, currentRow) => {
+      const currentRowTrimmedLength = currentRow.replace(/0+$/, '').length;
+      const maxRowTrimmedLength = maxRow.replace(/0+$/, '').length;
+      
+      // Compara primero por longitud, luego por cantidad de ceros al final si hay empate en longitud
+      if (currentRow.length > maxRow.length) {
+          return currentRow;
+      } else if (currentRow.length === maxRow.length) {
+          return currentRowTrimmedLength > maxRowTrimmedLength ? currentRow : maxRow;
+      } else {
+          return maxRow;
+      }
+    }, '');
 
-    return rows.map(row => {
+    let foundFirstMaxColumnRowMatch = false;  
+    return rows.map((row, index) => {
       const currentRowIsBinary = binaryRows.includes(row);
       if (currentRowIsBinary) {
-        const rowToEncode = row === maxColumnRow ? row : row.replace(/0+$/, '');
+        const currentRowIsEqualToMaxColumnRow = row === maxColumnRow;
+        const rowToEncode = currentRowIsEqualToMaxColumnRow && !foundFirstMaxColumnRowMatch ? row : row.replace(/0+$/, '');
+        if(!foundFirstMaxColumnRowMatch && currentRowIsEqualToMaxColumnRow){
+          foundFirstMaxColumnRowMatch = true;
+        }
+        console.log(index, rowToEncode);
         return rowToEncode.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join('');
       } 
       return row.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join(CODEBOOK['|']);
@@ -116,14 +132,18 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
     localStorage.removeItem(mode);
   };
 
-  const handleInputChange = (e:React.ChangeEvent<HTMLTextAreaElement>, index?: number) => {
-    const {value} = e.target;
+  const handleInputChange = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+    // Get the textarea element and its current cursor position
+    const target = e.target as HTMLTextAreaElement;
+    const { value, id } = target;
     if (mode === 'compress' || inputMode === 'serial') {
       setInput(value);
-    } else if (index !== undefined) {
+    }else{
+      const isLeftInput = id === 'left';
+      console.log(id);
       setParallelInput(prev => {
         const newInput = [...prev];
-        newInput[index] = value;
+        newInput[isLeftInput ? 0 : 1] = value;
         return newInput;
       });
     }

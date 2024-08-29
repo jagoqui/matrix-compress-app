@@ -115,7 +115,8 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
     localStorage.removeItem(mode);
   };
 
-  const handleInputChange = (value: string, index?: number) => {
+  const handleInputChange = (e:React.ChangeEvent<HTMLTextAreaElement>, index?: number) => {
+    const {value} = e.target;
     const sanitizedValue = mode === 'compress' 
       ? value.replace(/[^0-9A-Fa-f\n]/g, '').toUpperCase()
       : value.replace(CLEANED_ICONS_REGEX, '');
@@ -131,7 +132,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
     }
   };
 
-  const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>, index?: number) => {
+  const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (mode === 'decompress') {
       const key = e.key.toLowerCase();
       const icon = KEY_TO_ICON[key as IconsKeys];

@@ -78,14 +78,14 @@ export const CompressApp: React.FC = () => {
               <CustomTextArea
                 placeholder="Parte inicial presione las teclas de la izquierda."
                 value={parallelInput[0]}
-                onChange={(value: string) => handleInputChange(value, 0)}
+                onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(event, 1)}
                 onKeyPress={handleKeyPress}
                 className="w-1/2"
               />
               <CustomTextArea
                 placeholder="Parte final, presione las teclas de la derecha"
                 value={parallelInput[1]}
-                onChange={(value: string) => handleInputChange(value, 1)}
+                onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(event, 1)}
                 onKeyPress={handleKeyPress}
                 className="w-1/2"
               />

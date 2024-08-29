@@ -11,7 +11,7 @@ interface MatrixVisualizationProps {
 export const MatrixVisualization: React.FC<MatrixVisualizationProps> = ({ mode, input, output }) => {
   return (
     <div className="mb-4">
-      <h3 className="text-lg font-semibold">
+      <h3 className="text-lg font-semibold mb-3">
         {mode === 'compress' ? 'Visualización de Matriz Comprimida' : 'Visualización de Matriz Descomprimida'}
       </h3>
       <MatrixCanvas input={mode === 'compress' ? input : output} />

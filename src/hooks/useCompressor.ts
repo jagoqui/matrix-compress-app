@@ -117,44 +117,55 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
 
   const handleInputChange = (e:React.ChangeEvent<HTMLTextAreaElement>, index?: number) => {
     const {value} = e.target;
-    const sanitizedValue = mode === 'compress' 
-      ? value.replace(/[^0-9A-Fa-f\n]/g, '').toUpperCase()
-      : value.replace(CLEANED_ICONS_REGEX, '');
-
-    if (inputMode === 'serial') {
-      setInput(sanitizedValue);
+    if (mode === 'compress' || inputMode === 'serial') {
+      setInput(value);
     } else if (index !== undefined) {
       setParallelInput(prev => {
         const newInput = [...prev];
-        newInput[index] = sanitizedValue;
+        newInput[index] = value;
         return newInput;
       });
     }
   };
 
-  const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (mode === 'decompress') {
-      const key = e.key.toLowerCase();
-      const icon = KEY_TO_ICON[key as IconsKeys];
-      if (!icon) return;
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+     // Get the textarea element and its current cursor position
+    const target = e.target as HTMLTextAreaElement;
+    const { selectionStart, selectionEnd } = target;
+    const upperCasedKey = e.key.toUpperCase();
+    const sanitizedValue = mode === 'compress' 
+      ? upperCasedKey.replace(/[^0-9A-Fa-f\n]/g, '')
+      : upperCasedKey.replace(CLEANED_ICONS_REGEX, KEY_TO_ICON[upperCasedKey as IconsKeys] ?? '');
 
-      e.preventDefault();
-
-      if (inputMode === 'serial') {
-        setInput(prev => prev + icon);
-      } else {
+    // Si no hay valor sanitizado, previene la acción predeterminada y la propagación
+    if (!(sanitizedValue && sanitizedValue.length)) {
+        return;
+    }
+    
+    if (mode === 'compress') {
+      setInput((prev) => prev.substring(0, selectionStart) + sanitizedValue + prev.substring(selectionEnd));
+    }else{
+      if(inputMode === 'serial'){
+        setInput((prev) => prev.substring(0, selectionStart) + sanitizedValue + prev.substring(selectionEnd));
+      }else{
+        const pressLeftKeys = LEFT_ICONS_KEYS_ARRAY.includes(upperCasedKey as LeftIconsKeys);
+        const index =  pressLeftKeys ? 0 : 1
         setParallelInput(prev => {
           const newInput = [...prev];
-          if (LEFT_ICONS_KEYS_ARRAY.includes(key as LeftIconsKeys)) {
-            newInput[0] += icon;
-          } else if (RIGHT_ICONS_KEYS_ARRAY.includes(key as RightIconsKeys)) {
-            newInput[1] += icon;
-          }
+          newInput[index] = prev[index].substring(0, selectionStart) + sanitizedValue + prev[index].substring(selectionEnd);
           return newInput;
         });
       }
     }
+    // Ajusta la posición del cursor después de actualizar el input
+    setTimeout(() => {
+      target.selectionStart = selectionStart + sanitizedValue.length;
+      target.selectionEnd = selectionStart + sanitizedValue.length;
+    }, 0); 
   };
+
 
   useEffect(() => {
     if (inputMode === 'parallel') {

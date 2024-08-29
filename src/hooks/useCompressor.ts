@@ -78,7 +78,6 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
         if(!foundFirstMaxColumnRowMatch && currentRowIsEqualToMaxColumnRow){
           foundFirstMaxColumnRowMatch = true;
         }
-        console.log(index, rowToEncode);
         return rowToEncode.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join('');
       } 
       return row.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join(CODEBOOK['|']);
@@ -140,7 +139,6 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       setInput(value);
     }else{
       const isLeftInput = id === 'left';
-      console.log(id);
       setParallelInput(prev => {
         const newInput = [...prev];
         newInput[isLeftInput ? 0 : 1] = value;

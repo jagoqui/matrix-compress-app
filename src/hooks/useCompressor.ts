@@ -1,15 +1,16 @@
 import { useState, useEffect, KeyboardEvent } from 'react';
 import { 
   ALLOWED_ICONS_REGEX, 
+  BREAK_LINE, 
   CLEANED_ICONS_REGEX, 
   CODEBOOK, 
+  EMOJI_REGEX, 
+  HEX_SEPARATOR, 
   IconsKeys, 
   KEY_TO_ICON, 
   LEFT_ICONS_KEYS_ARRAY, 
   LeftIconsKeys, 
   REVERSE_CODEBOOK, 
-  RIGHT_ICONS_KEYS_ARRAY, 
-  RightIconsKeys 
 } from '../constants/constants';
 import { Mode } from '@/models/commons.models';
 
@@ -47,11 +48,11 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   }, [mode, input]);
 
   const countIcons = (text: string) => {
-    return text.match(/\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu)?.length || 0;
+    return text.match(EMOJI_REGEX)?.length || 0;
   };
 
   const compress = (text: string) => {
-    const rows = text.split('\n');
+    const rows = text.split(BREAK_LINE);
     const binaryRows = rows.filter(row => /^[01\n]+$/.test(row));
     const maxColumnRow = binaryRows.reduce(
       (maxRow, currentRow) => (currentRow.length > (maxRow?.length ?? 0) ? currentRow : maxRow), 
@@ -63,10 +64,9 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       if (currentRowIsBinary) {
         const rowToEncode = row === maxColumnRow ? row : row.replace(/0+$/, '');
         return rowToEncode.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join('');
-      } else {
-        return row.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join(CODEBOOK['|']);
-      }
-    }).join(CODEBOOK['\n']);
+      } 
+      return row.split('').map(char => CODEBOOK[char.toUpperCase()] || char).join(CODEBOOK['|']);
+    }).join(CODEBOOK[BREAK_LINE]);
   };
 
   const decompress = (text: string) => {
@@ -74,16 +74,17 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
       return ''; 
     }
 
-    const rows = text.split(CODEBOOK['\n']);
+    const rows = text.split(CODEBOOK[BREAK_LINE]);
     let result = rows.map(row => {
-      if (row.includes(CODEBOOK['|'])) {
-        return row.split(CODEBOOK['|']).map(code => REVERSE_CODEBOOK[code] || code).join('');
-      } else {
-        return row.split('').map(char => REVERSE_CODEBOOK[char] || char).join('');
+      const currentRowHasHexSeparators = row.includes(CODEBOOK[HEX_SEPARATOR]);
+      if (currentRowHasHexSeparators) {
+        const rowWithHexValues = row.split(CODEBOOK[HEX_SEPARATOR]);
+        return rowWithHexValues.map(code => REVERSE_CODEBOOK[code] || code).join('');
       }
-    }).join('\n');
+      return  row.replace(EMOJI_REGEX, (match) => REVERSE_CODEBOOK[match] || match);
+    }).join(BREAK_LINE);
 
-    const resultRows = result.split('\n');
+    const resultRows = result.split(BREAK_LINE);
     const binaryRows = resultRows.filter(row => /^[01]+$/.test(row));
     const maxBinaryRowLength = Math.max(...binaryRows.map(row => row.length));
 
@@ -95,7 +96,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
         return normalizedBinaryRows[binaryRowIndex++];
       }
       return row;
-    }).join('\n').trim();
+    }).join(BREAK_LINE).trim();
   };
 
   const processInput = (text: string) => {

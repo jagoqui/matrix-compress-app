@@ -1,5 +1,7 @@
 
 export type Icon = '🔴' | '🟢' | '🔵' | '⚪' | '🚦' | '💡';
+export const HEX_SEPARATOR = '|';
+export const BREAK_LINE = '\n';
 
 export const CODEBOOK: { [p: string]: Icon | `${Icon}${Icon}` } = {
   "0": "🔴",
@@ -18,8 +20,8 @@ export const CODEBOOK: { [p: string]: Icon | `${Icon}${Icon}` } = {
   "D": "🔵🟢",
   "E": "⚪🔵",
   "F": "⚪",
-  "\n": "🚦",       // 1 símbolo (indicador de nueva línea)
-  "|": "💡"        // 1 símbolo (indicador de separación)
+  [BREAK_LINE]: "🚦",       // 1 símbolo (indicador de nueva línea)
+  [HEX_SEPARATOR]: "💡"        // 1 símbolo (indicador de separación)
 };
 
 export const REVERSE_CODEBOOK = Object.fromEntries(
@@ -98,3 +100,5 @@ for (const [icon, keys] of Object.entries(KEY_GROUPS) as [Icon, IconsKeys[]][]) 
 
 // Asegurar a TypeScript que keyToIconMap ahora cumple con Record<Key, Icon>
 export const KEY_TO_ICON = keyToIconMap as Record<IconsKeys, Icon>;
+
+export const EMOJI_REGEX = /\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu;

@@ -1,41 +1,40 @@
-
 export type Icon = '🔴' | '🟢' | '🔵' | '⚪' | '🚦' | '💡';
 export const HEX_SEPARATOR = '|';
 export const BREAK_LINE = '\n';
 
 export const CODEBOOK: { [p: string]: Icon | `${Icon}${Icon}` } = {
-  "0": "🔴",
-  "1": "🟢",
-  "2": "🔴🟢",
-  "3": "🔴🔵",
-  "4": "🔴⚪",
-  "5": "🟢🔵",
-  "6": "🟢⚪",
-  "7": "🔵⚪",
-  "8": "⚪⚪",
-  "9": "🔵",
-  "A": "🔵🔴",
-  "B": "🟢🔴",
-  "C": "⚪🔴",
-  "D": "🔵🟢",
-  "E": "⚪🔵",
-  "F": "⚪",
-  [BREAK_LINE]: "🚦",       // 1 símbolo (indicador de nueva línea)
-  [HEX_SEPARATOR]: "💡"        // 1 símbolo (indicador de separación)
+  '0': '🔴',
+  '1': '🟢',
+  '2': '🔴🟢',
+  '3': '🔴🔵',
+  '4': '🔴⚪',
+  '5': '🟢🔵',
+  '6': '🟢⚪',
+  '7': '🔵⚪',
+  '8': '⚪⚪',
+  '9': '🔵',
+  A: '🔵🔴',
+  B: '🟢🔴',
+  C: '⚪🔴',
+  D: '🔵🟢',
+  E: '⚪🔵',
+  F: '⚪',
+  [BREAK_LINE]: '🚦', // 1 símbolo (indicador de nueva línea)
+  [HEX_SEPARATOR]: '💡', // 1 símbolo (indicador de separación)
 };
 
 export const REVERSE_CODEBOOK = Object.fromEntries(
-  Object.entries(CODEBOOK).map(([key, value]) => [value, key])
+  Object.entries(CODEBOOK).map(([key, value]) => [value, key]),
 );
 
 // Define the icon-to-letter mapping
 export const ICON_TO_LETTER_MAP: { [key in Icon]: string } = {
-  "🔴": "R",
-  "🟢": "G",
-  "🔵": "V",
-  "⚪": "W",
-  "🚦": "Y",
-  "💡": "X"
+  '🔴': 'R',
+  '🟢': 'G',
+  '🔵': 'V',
+  '⚪': 'W',
+  '🚦': 'Y',
+  '💡': 'X',
 };
 
 // Función para extraer íconos únicos del CODEBOOK
@@ -72,10 +71,24 @@ export const CLEANED_ICONS_REGEX = buildCleanedIconsRegex(CODEBOOK);
 // Mapeo de teclas a íconos
 // Definición de tipo para las teclas
 export type LeftIconsKeys = 'A' | 'Q' | 'W' | 'S' | 'E' | 'D';
-export type RightIconsKeys = 'K' | 'I' | 'O' | 'L' | 'P'| 'Ñ';
+export type RightIconsKeys = 'K' | 'I' | 'O' | 'L' | 'P' | 'Ñ';
 // Definición de arrays de teclas
-export const LEFT_ICONS_KEYS_ARRAY: ReadonlyArray<LeftIconsKeys> = ['A', 'Q', 'W', 'S', 'E', 'D'];
-export const RIGHT_ICONS_KEYS_ARRAY: ReadonlyArray<RightIconsKeys> = ['K', 'I', 'O', 'L', 'P', 'Ñ'];
+export const LEFT_ICONS_KEYS_ARRAY: ReadonlyArray<LeftIconsKeys> = [
+  'A',
+  'Q',
+  'W',
+  'S',
+  'E',
+  'D',
+];
+export const RIGHT_ICONS_KEYS_ARRAY: ReadonlyArray<RightIconsKeys> = [
+  'K',
+  'I',
+  'O',
+  'L',
+  'P',
+  'Ñ',
+];
 export type IconsKeys = LeftIconsKeys | RightIconsKeys;
 
 // Mapeo simbólico de teclas a íconos
@@ -85,14 +98,17 @@ const KEY_GROUPS: Record<Icon, IconsKeys[]> = {
   '🔵': ['D', 'Ñ'],
   '⚪': ['S', 'L'],
   '💡': ['Q', 'I'],
-  '🚦': ['E', 'P']
+  '🚦': ['E', 'P'],
 };
 
 // Inicializar el mapeo de teclas a íconos con Partial para evitar el error inicial
 const keyToIconMap: Partial<Record<IconsKeys, Icon>> = {};
 
 // Llenar el objeto keyToIconMap usando el objeto de grupos de teclas
-for (const [icon, keys] of Object.entries(KEY_GROUPS) as [Icon, IconsKeys[]][]) {
+for (const [icon, keys] of Object.entries(KEY_GROUPS) as [
+  Icon,
+  IconsKeys[],
+][]) {
   for (const key of keys) {
     keyToIconMap[key] = icon;
   }

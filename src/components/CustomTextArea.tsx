@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from '@/components/ui/textarea';
 
 interface CustomTextAreaProps {
   placeholder: string;
@@ -10,18 +10,20 @@ interface CustomTextAreaProps {
   className?: string;
 }
 
-const CustomTextArea = forwardRef<HTMLTextAreaElement, CustomTextAreaProps>(({ placeholder, value, onChange, onKeyPress, className, id }, ref) => (
-  <Textarea
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange} // Pass the event directly
-    onKeyPress={onKeyPress}
-    id={id}
-    className={className || "mb-4 font-mono text-lg h-80"}
-    ref={ref} // Pass ref to the inner Textarea component
-  />
-));
+const CustomTextArea = forwardRef<HTMLTextAreaElement, CustomTextAreaProps>(
+  ({ placeholder, value, onChange, onKeyPress, className, id }, ref) => (
+    <Textarea
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange} // Pass the event directly
+      onKeyPress={onKeyPress}
+      id={id}
+      className={className || 'mb-4 font-mono text-lg h-80'}
+      ref={ref} // Pass ref to the inner Textarea component
+    />
+  ),
+);
 
-CustomTextArea.displayName = "CustomTextarea";
+CustomTextArea.displayName = 'CustomTextarea';
 
 export { CustomTextArea };

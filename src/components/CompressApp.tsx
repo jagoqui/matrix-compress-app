@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useCompressor } from '../hooks/useCompressor';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import { CustomTextArea } from './CustomTextArea';
@@ -23,7 +29,7 @@ export const CompressApp: React.FC = () => {
     output,
     charCount,
     handleInputChange,
-    handleKeyPress
+    handleKeyPress,
   } = useCompressor();
 
   const [showCopyModal, setShowCopyModal] = useState(false);
@@ -40,10 +46,12 @@ export const CompressApp: React.FC = () => {
   const transformOutputToLetterCodebook = (text: string): string => {
     const iconRegex = /\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu;
     const icons = text.match(iconRegex) || [];
-    return icons.map(icon => {
-      const letter = ICON_TO_LETTER_MAP[icon as Icon] || icon;
-      return letter;
-    }).join('');
+    return icons
+      .map((icon) => {
+        const letter = ICON_TO_LETTER_MAP[icon as Icon] || icon;
+        return letter;
+      })
+      .join('');
   };
 
   useEffect(() => {
@@ -64,13 +72,17 @@ export const CompressApp: React.FC = () => {
           <SwitchWithLabel
             checked={mode === 'decompress'}
             label={`Modo: ${mode === 'compress' ? 'Comprimir' : 'Descomprimir'}`}
-            onCheckedChange={(checked: boolean) => setMode(checked ? 'decompress' : 'compress')}
+            onCheckedChange={(checked: boolean) =>
+              setMode(checked ? 'decompress' : 'compress')
+            }
           />
           {mode === 'decompress' && (
             <SwitchWithLabel
               checked={inputMode === 'parallel'}
               label={`Modo de entrada: ${inputMode === 'serial' ? 'Serial' : 'Paralelo'}`}
-              onCheckedChange={(checked: boolean) => setInputMode(checked ? 'parallel' : 'serial')}
+              onCheckedChange={(checked: boolean) =>
+                setInputMode(checked ? 'parallel' : 'serial')
+              }
             />
           )}
           {mode === 'decompress' && inputMode === 'parallel' ? (
@@ -94,7 +106,11 @@ export const CompressApp: React.FC = () => {
             </div>
           ) : (
             <CustomTextArea
-              placeholder={mode === 'compress' ? "Ingrese el texto a comprimir" : "Ingrese el texto codificado a descomprimir"}
+              placeholder={
+                mode === 'compress'
+                  ? 'Ingrese el texto a comprimir'
+                  : 'Ingrese el texto codificado a descomprimir'
+              }
               value={input}
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
@@ -102,9 +118,22 @@ export const CompressApp: React.FC = () => {
           )}
           <Button onClick={handleReset}>Reset</Button>
           {mode === 'decompress' && <KeyBoardPressViewer />}
-          <MatrixVisualization mode={mode} input={input} output={output} /><br/>
-          <CopyableOutput title="CodeBook Arduino" content={letterCodebookOutput} onCopy={(text) => handleCopy(text, 'CodeBook para el Arduino copiado')} />
-          <CopyableOutput title="CODEBOOK Descompresor" content={output} onCopy={(text) => handleCopy(text, 'CoodeBook para el descompresor copiado')} />
+          <MatrixVisualization mode={mode} input={input} output={output} />
+          <br />
+          <CopyableOutput
+            title="CodeBook Arduino"
+            content={letterCodebookOutput}
+            onCopy={(text) =>
+              handleCopy(text, 'CodeBook para el Arduino copiado')
+            }
+          />
+          <CopyableOutput
+            title="CODEBOOK Descompresor"
+            content={output}
+            onCopy={(text) =>
+              handleCopy(text, 'CoodeBook para el descompresor copiado')
+            }
+          />
           <div className="mb-4">
             <p>Caracteres antes: {charCount.before}</p>
             <p>Caracteres después: {charCount.after}</p>

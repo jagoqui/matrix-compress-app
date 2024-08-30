@@ -1,18 +1,18 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Matrix compressor",
-  description: "Matrix compress/decompress for system light communication.",
-  category: "website",
-  generator: "Next.js", // framework used
-  manifest: "/manifest.json",
-  icons:{
-    apple: "/icon.png"
-  }
+  title: 'Matrix compressor',
+  description: 'Matrix compress/decompress for system light communication.',
+  category: 'website',
+  generator: 'Next.js', // framework used
+  manifest: '/manifest.json',
+  icons: {
+    apple: '/icon.png',
+  },
 };
 
 export default function RootLayout({

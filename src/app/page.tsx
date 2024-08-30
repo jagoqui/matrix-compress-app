@@ -1,9 +1,7 @@
-"use client";
+'use client';
 
-import { CompressApp } from "@/components/CompressApp";
+import { CompressApp } from '@/components/CompressApp';
 
 export default function Home() {
-  return (
-   <CompressApp/>
-  );
+  return <CompressApp />;
 }

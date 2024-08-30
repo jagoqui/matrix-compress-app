@@ -16,7 +16,7 @@ export const MatrixCanvas: React.FC<MatrixCanvasProps> = ({ input }) => {
 
     const cellSize = 30; // Increased cell size
     const rows = input.split('\n');
-    const maxWidth = Math.max(...rows.map(row => row.length));
+    const maxWidth = Math.max(...rows.map((row) => row.length));
 
     canvas.width = maxWidth * cellSize;
     canvas.height = rows.length * cellSize;
@@ -25,8 +25,10 @@ export const MatrixCanvas: React.FC<MatrixCanvasProps> = ({ input }) => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     rows.forEach((row, y) => {
-      const isPixelRow = row.split('').every(char => char === '0' || char === '1' || char === '\n');
-      
+      const isPixelRow = row
+        .split('')
+        .every((char) => char === '0' || char === '1' || char === '\n');
+
       if (isPixelRow) {
         Array.from(row).forEach((char, x) => {
           ctx.fillStyle = char === '1' ? 'black' : 'white';

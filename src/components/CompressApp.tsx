@@ -67,6 +67,16 @@ export const CompressApp: React.FC = () => {
     element.setSelectionRange(length, length);
   };
 
+  const inputModeToggle = (parallel: boolean): void =>{
+    const length = compressDecompressElementRef?.current?.value?.length;
+    if(parallel && length ){
+      if(!confirm('¿Seguro que desea cambiar de modo?, se perderá los datos.')){
+        return;
+      }
+    }
+    setInputMode(parallel ? 'parallel' : 'serial')
+  }
+
   useEffect(() => {
     if (!output) {
       return;
@@ -103,9 +113,7 @@ export const CompressApp: React.FC = () => {
             <SwitchWithLabel
               checked={inputMode === 'parallel'}
               label={`Modo de entrada: ${inputMode === 'serial' ? 'Serial' : 'Paralelo'}`}
-              onCheckedChange={(checked: boolean) =>
-                setInputMode(checked ? 'parallel' : 'serial')
-              }
+              onCheckedChange={inputModeToggle}
             />
           )}
           {mode === 'decompress' && inputMode === 'parallel' ? (

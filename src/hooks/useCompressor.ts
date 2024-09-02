@@ -176,20 +176,23 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    console.log(e.key);
     e.preventDefault();
     e.stopPropagation();
     // Get the textarea element and its current cursor position
     const target = e.target as HTMLTextAreaElement;
     const { selectionStart, selectionEnd } = target;
     const upperCasedKey = e.key.toUpperCase();
+    // Determine sanitized value based on the mode and the key pressed
     const sanitizedValue =
       mode === 'compress'
-        ? upperCasedKey.replace(/[^0-9A-Fa-f\n]/g, '')
+        ? e.key === 'Enter'
+          ? '\n' // Replace Enter with a newline character
+          : upperCasedKey.replace(/[^0-9A-Fa-f]/g, '') // Allow only hex characters
         : upperCasedKey.replace(
             CLEANED_ICONS_REGEX,
             KEY_TO_ICON[upperCasedKey as IconsKeys] ?? '',
           );
-
     // Si no hay valor sanitizado, previene la acción predeterminada y la propagación
     if (!(sanitizedValue && sanitizedValue.length)) {
       return;

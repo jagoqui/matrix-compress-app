@@ -13,6 +13,7 @@ import {
   REVERSE_CODEBOOK,
 } from '../constants/constants';
 import { Mode } from '@/models/commons.models';
+import { useLocalStorage } from './useLocalStorage';
 
 const EXAMPLE_MATRIX = `DA705901AB9D
 01111110
@@ -28,22 +29,18 @@ const EXAMPLE_MATRIX = `DA705901AB9D
 
 type InputMode = 'serial' | 'parallel';
 
-const getInitialInput = (mode: string, fallback: string): string => {
-  const savedInput = localStorage.getItem(mode);
-  return savedInput?.length ? savedInput : fallback;
-};
-
-
 export const useCompressor = (initialMode: Mode = 'compress') => {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [inputMode, setInputMode] = useState<InputMode>('serial');
-  const [input, setInput] = useState(() => getInitialInput(mode, EXAMPLE_MATRIX));
+  const [input, setInput] = useLocalStorage(mode, EXAMPLE_MATRIX);
   const [parallelInput, setParallelInput] = useState(['', '']);
   const [output, setOutput] = useState('');
   const [charCount, setCharCount] = useState({ before: 0, after: 0 });
 
-
-  useEffect(() => setInput(getInitialInput(mode, '')), [mode]);
+  useEffect(() => {
+    const savedInput = localStorage.getItem(mode);
+    setInput(savedInput?.length ? savedInput : '');
+  }, [mode]);
 
   useEffect(() => {
     localStorage.setItem(mode, input);
@@ -205,7 +202,7 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
 
     if (mode === 'compress') {
       setInput(
-        (prev) =>
+        (prev: string) =>
           prev.substring(0, selectionStart) +
           sanitizedValue +
           prev.substring(selectionEnd),

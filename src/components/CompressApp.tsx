@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
@@ -36,6 +36,10 @@ export const CompressApp: React.FC = () => {
   const [copyMessage, setCopyMessage] = useState('');
   const [letterCodebookOutput, setLetterCodebookOutput] = useState('');
 
+  const compressDecompressElementRef = useRef<HTMLTextAreaElement | null>(null);
+  const leftInputElementRef = useRef<HTMLTextAreaElement | null>(null);
+  const rightInputElementRef = useRef<HTMLTextAreaElement | null>(null);
+
   const handleCopy = (textToCopy: string, message: string) => {
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopyMessage(message);
@@ -54,6 +58,15 @@ export const CompressApp: React.FC = () => {
       .join('');
   };
 
+  const autoFocusInput = (element: HTMLTextAreaElement | null): void => {
+    if (!element) {
+      return;
+    }
+    element.focus();
+    const { length } = element.value;
+    element.setSelectionRange(length, length);
+  };
+
   useEffect(() => {
     if (!output) {
       return;
@@ -61,6 +74,16 @@ export const CompressApp: React.FC = () => {
     const transformedOutput = transformOutputToLetterCodebook(output);
     setLetterCodebookOutput(transformedOutput);
   }, [output]);
+
+  useEffect(() => {
+    if (mode === 'compress' || inputMode === 'serial') {
+      autoFocusInput(compressDecompressElementRef?.current);
+      return;
+    }
+    autoFocusInput(leftInputElementRef?.current);
+  }, [mode, inputMode]);
+
+  const memoizedHandleKeyPress = useCallback(handleKeyPress, [handleKeyPress]);
 
   return (
     <div className="container mx-auto p-4">
@@ -92,16 +115,18 @@ export const CompressApp: React.FC = () => {
                 value={parallelInput[0]}
                 id="left"
                 onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
+                onKeyPress={memoizedHandleKeyPress}
                 className="w-1/2"
+                ref={leftInputElementRef}
               />
               <CustomTextArea
                 placeholder="Parte final, presione las teclas de la derecha"
                 id="right"
                 value={parallelInput[1]}
                 onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
+                onKeyPress={memoizedHandleKeyPress}
                 className="w-1/2"
+                ref={rightInputElementRef}
               />
             </div>
           ) : (
@@ -113,11 +138,22 @@ export const CompressApp: React.FC = () => {
               }
               value={input}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
+              onKeyPress={memoizedHandleKeyPress}
+              ref={compressDecompressElementRef}
             />
           )}
           <Button onClick={handleReset}>Reset</Button>
-          {mode === 'decompress' && <KeyBoardPressViewer />}
+          {mode === 'decompress' &&
+            leftInputElementRef &&
+            rightInputElementRef && (
+              <KeyBoardPressViewer
+                parallelMode={mode === 'decompress' && inputMode === 'parallel'}
+                compressDecompressElementRef={compressDecompressElementRef}
+                handleKeyPress={memoizedHandleKeyPress}
+                leftInputElementRef={leftInputElementRef}
+                rightInputElementRef={rightInputElementRef}
+              />
+            )}
           <MatrixVisualization mode={mode} input={input} output={output} />
           <br />
           <CopyableOutput

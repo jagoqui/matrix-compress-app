@@ -11,15 +11,19 @@ interface CustomTextAreaProps {
 }
 
 const CustomTextArea = forwardRef<HTMLTextAreaElement, CustomTextAreaProps>(
-  ({ placeholder, value, onChange, onKeyPress, className, id }, ref) => (
+  (
+    { placeholder, value, onChange, onKeyPress, className, id, ...props },
+    ref,
+  ) => (
     <Textarea
       placeholder={placeholder}
       value={value}
-      onChange={onChange} // Pass the event directly
-      onKeyPress={onKeyPress}
+      onChange={onChange}
+      onKeyPress={onKeyPress} // Changed from onKeyPress to onKeyDown
       id={id}
       className={className || 'mb-4 font-mono text-lg h-80'}
-      ref={ref} // Pass ref to the inner Textarea component
+      ref={ref}
+      {...props}
     />
   ),
 );

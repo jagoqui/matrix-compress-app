@@ -1,13 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, MutableRefObject } from 'react';
 import { cn } from '@/lib/utils';
 import {
   Icon,
   IconsKeys,
   LeftIconsKeys,
   RightIconsKeys,
+  LEFT_ICONS_KEYS_ARRAY,
+  RIGHT_ICONS_KEYS_ARRAY,
 } from '@/constants/constants';
+import { Mode } from '@/models/commons.models';
+import { LayoutList } from 'lucide-react';
 
 const KEY_GROUPS: Record<Icon, IconsKeys[]> = {
   '🔴': ['A', 'K'],
@@ -38,8 +42,78 @@ const getKeyIcon = (key: IconsKeys): Icon => {
   )?.[0] as Icon;
 };
 
-export default function KeyBoardPressViewer() {
+interface KeyBoardPressViewerProps {
+  handleKeyPress: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  parallelMode: Boolean;
+  compressDecompressElementRef: MutableRefObject<HTMLTextAreaElement | null>;
+  leftInputElementRef: MutableRefObject<HTMLTextAreaElement | null>;
+  rightInputElementRef: MutableRefObject<HTMLTextAreaElement | null>;
+}
+
+interface CursorPosition {
+  start: number;
+  end: number;
+}
+
+interface ElementData {
+  target: HTMLTextAreaElement | null;
+  lastCursorPos: CursorPosition;
+}
+
+const getCursorPosition = (
+  element: HTMLTextAreaElement | null,
+): CursorPosition => {
+  return {
+    start: element?.selectionStart ?? 0,
+    end: element?.selectionEnd ?? 0,
+  };
+};
+
+export default function KeyBoardPressViewer({
+  handleKeyPress,
+  parallelMode,
+  compressDecompressElementRef,
+  leftInputElementRef,
+  rightInputElementRef,
+}: KeyBoardPressViewerProps) {
   const [pressedKeys, setPressedKeys] = useState<Set<IconsKeys>>(new Set());
+
+  const getCurrentElement = (key: IconsKeys): HTMLTextAreaElement | null => {
+    const isLeftKey = LEFT_ICONS_KEYS_ARRAY.includes(key as LeftIconsKeys);
+    if (parallelMode) {
+      return isLeftKey
+        ? leftInputElementRef?.current
+        : rightInputElementRef?.current;
+    }
+    return compressDecompressElementRef?.current;
+  };
+
+  const simulateKeyPress = (key: IconsKeys) => {
+    const target = getCurrentElement(key);
+
+    const event = new KeyboardEvent('keydown', {
+      key: key,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    Object.defineProperty(event, 'target', {
+      writable: false,
+      value: target,
+    });
+
+    handleKeyPress(
+      event as unknown as React.KeyboardEvent<HTMLTextAreaElement>,
+    );
+
+    // Use setTimeout to ensure that the cursor is set after the key press event has been processed
+    setTimeout(() => {
+      if (!target) {
+        return;
+      }
+      target.focus();
+    }, 0);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -67,10 +141,16 @@ export default function KeyBoardPressViewer() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [
+    handleKeyPress,
+    compressDecompressElementRef,
+    leftInputElementRef,
+    rightInputElementRef,
+  ]);
 
   const handleMouseDown = (key: IconsKeys) => {
     setPressedKeys((prev) => new Set(prev).add(key));
+    simulateKeyPress(key);
   };
 
   const handleMouseUp = (key: IconsKeys) => {

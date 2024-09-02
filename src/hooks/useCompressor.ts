@@ -12,7 +12,7 @@ import {
   LeftIconsKeys,
   REVERSE_CODEBOOK,
 } from '../constants/constants';
-import { Mode } from '@/models/commons.models';
+import { InputMode, Mode } from '@/models/commons.models';
 import { useLocalStorage } from './useLocalStorage';
 
 const EXAMPLE_MATRIX = `DA705901AB9D
@@ -27,7 +27,6 @@ const EXAMPLE_MATRIX = `DA705901AB9D
 11111111
 11011011`;
 
-type InputMode = 'serial' | 'parallel';
 
 export const useCompressor = (initialMode: Mode = 'compress') => {
   const [mode, setMode] = useState<Mode>(initialMode);

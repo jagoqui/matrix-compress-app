@@ -14,12 +14,7 @@ import {
 } from '../constants/constants';
 import { Mode } from '@/models/commons.models';
 
-type InputMode = 'serial' | 'parallel';
-
-export const useCompressor = (initialMode: Mode = 'compress') => {
-  const [mode, setMode] = useState<Mode>(initialMode);
-  const [inputMode, setInputMode] = useState<InputMode>('serial');
-  const [input, setInput] = useState(`DA705901AB9D
+const EXAMPLE_MATRIX = `DA705901AB9D
 01111110
 11011011
 11111111
@@ -29,15 +24,26 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
 00111100
 01111110
 11111111
-11011011`);
+11011011`;
+
+type InputMode = 'serial' | 'parallel';
+
+const getInitialInput = (mode: string, fallback: string): string => {
+  const savedInput = localStorage.getItem(mode);
+  return savedInput?.length ? savedInput : fallback;
+};
+
+
+export const useCompressor = (initialMode: Mode = 'compress') => {
+  const [mode, setMode] = useState<Mode>(initialMode);
+  const [inputMode, setInputMode] = useState<InputMode>('serial');
+  const [input, setInput] = useState(() => getInitialInput(mode, EXAMPLE_MATRIX));
   const [parallelInput, setParallelInput] = useState(['', '']);
   const [output, setOutput] = useState('');
   const [charCount, setCharCount] = useState({ before: 0, after: 0 });
 
-  useEffect(() => {
-    const savedInput = localStorage.getItem(mode);
-    setInput(savedInput ?? '');
-  }, [mode, inputMode]);
+
+  useEffect(() => setInput(getInitialInput(mode, '')), [mode]);
 
   useEffect(() => {
     localStorage.setItem(mode, input);

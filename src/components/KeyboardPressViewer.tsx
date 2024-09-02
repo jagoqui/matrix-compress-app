@@ -2,34 +2,30 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-
-type LeftIconsKeys = 'a' | 'q' | 'w' | 's' | 'e' | 'd';
-type RightIconsKeys = 'k' | 'i' | 'o' | 'l' | 'p' | 'ñ';
-type IconsKeys = LeftIconsKeys | RightIconsKeys;
-type Icon = '🔴' | '🟢' | '🔵' | '⚪' | '💡' | '🚦';
+import { Icon, IconsKeys, LeftIconsKeys, RightIconsKeys } from '@/constants/constants';
 
 const KEY_GROUPS: Record<Icon, IconsKeys[]> = {
-  '🔴': ['a', 'k'],
-  '🟢': ['w', 'o'],
-  '🔵': ['d', 'ñ'],
-  '⚪': ['s', 'l'],
-  '💡': ['q', 'i'],
-  '🚦': ['e', 'p'],
+  '🔴': ['A', 'K'],
+  '🟢': ['W', 'O'],
+  '🔵': ['D', 'Ñ'],
+  '⚪': ['S', 'L'],
+  '💡': ['Q', 'I'],
+  '🚦': ['E', 'P'],
 };
 
 const LEFT_KEYS: (LeftIconsKeys | null)[][] = [
-  ['q', 'w', 'e'],
-  ['a', 's', 'd'],
+  ['Q', 'W', 'E'],
+  ['A', 'S', 'D'],
   [null, null, null],
 ];
 
 const RIGHT_KEYS: (RightIconsKeys | null)[][] = [
-  ['i', 'o', 'p'],
-  ['k', 'l', 'ñ'],
+  ['I', 'O', 'P'],
+  ['K', 'L', 'Ñ'],
   [null, null, null],
 ];
 
-const HIGHLIGHTED_KEYS = new Set(['w', 'a', 's', 'd', 'k', 'o', 'l', 'ñ']);
+const HIGHLIGHTED_KEYS = new Set(['W', 'A', 'S', 'D', 'K', 'O', 'L', 'Ñ']);
 
 const getKeyIcon = (key: IconsKeys): Icon => {
   return Object.entries(KEY_GROUPS).find(([_, keys]) =>
@@ -42,14 +38,14 @@ export default function KeyBoardPressViewer() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase() as IconsKeys;
+      const key = e.key.toUpperCase() as IconsKeys;
       if ([...LEFT_KEYS.flat(), ...RIGHT_KEYS.flat()].includes(key)) {
         setPressedKeys((prev) => new Set(prev).add(key));
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase() as IconsKeys;
+      const key = e.key.toUpperCase() as IconsKeys;
       if ([...LEFT_KEYS.flat(), ...RIGHT_KEYS.flat()].includes(key)) {
         setPressedKeys((prev) => {
           const newSet = new Set(prev);

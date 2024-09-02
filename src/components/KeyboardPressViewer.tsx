@@ -2,15 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Icon, IconsKeys, LeftIconsKeys, RightIconsKeys } from '@/constants/constants';
+import {
+  Icon,
+  IconsKeys,
+  LeftIconsKeys,
+  RightIconsKeys,
+} from '@/constants/constants';
 
 const KEY_GROUPS: Record<Icon, IconsKeys[]> = {
   '🔴': ['A', 'K'],
   '🟢': ['W', 'O'],
   '🔵': ['D', 'Ñ'],
   '⚪': ['S', 'L'],
-  '💡': ['Q', 'I'],
-  '🚦': ['E', 'P'],
+  '🚨': ['Q', 'I'],
+  '🌿': ['E', 'P'],
 };
 
 const LEFT_KEYS: (LeftIconsKeys | null)[][] = [

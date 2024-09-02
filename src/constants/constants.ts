@@ -1,4 +1,4 @@
-export type Icon = '🔴' | '🟢' | '🔵' | '⚪' | '🚦' | '💡';
+export type Icon = '🔴' | '🟢' | '🔵' | '⚪' | '🌿' | '🚨';
 export const HEX_SEPARATOR = '|';
 export const BREAK_LINE = '\n';
 
@@ -19,8 +19,8 @@ export const CODEBOOK: { [p: string]: Icon | `${Icon}${Icon}` } = {
   D: '🔵🟢',
   E: '⚪🔵',
   F: '⚪',
-  [BREAK_LINE]: '🚦', // 1 símbolo (indicador de nueva línea)
-  [HEX_SEPARATOR]: '💡', // 1 símbolo (indicador de separación)
+  [BREAK_LINE]: '🌿', // 1 símbolo (indicador de nueva línea)
+  [HEX_SEPARATOR]: '🚨', // 1 símbolo (indicador de separación)
 };
 
 export const REVERSE_CODEBOOK = Object.fromEntries(
@@ -33,8 +33,8 @@ export const ICON_TO_LETTER_MAP: { [key in Icon]: string } = {
   '🟢': 'G',
   '🔵': 'V',
   '⚪': 'W',
-  '🚦': 'Y',
-  '💡': 'X',
+  '🌿': 'Y',
+  '🚨': 'X',
 };
 
 // Función para extraer íconos únicos del CODEBOOK
@@ -97,8 +97,8 @@ const KEY_GROUPS: Record<Icon, IconsKeys[]> = {
   '🟢': ['W', 'O'],
   '🔵': ['D', 'Ñ'],
   '⚪': ['S', 'L'],
-  '💡': ['Q', 'I'],
-  '🚦': ['E', 'P'],
+  '🚨': ['Q', 'I'],
+  '🌿': ['E', 'P'],
 };
 
 // Inicializar el mapeo de teclas a íconos con Partial para evitar el error inicial

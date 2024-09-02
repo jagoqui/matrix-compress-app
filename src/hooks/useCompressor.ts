@@ -182,7 +182,6 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    console.log(e.key);
     e.preventDefault();
     e.stopPropagation();
     // Get the textarea element and its current cursor position

@@ -27,7 +27,6 @@ const EXAMPLE_MATRIX = `DA705901AB9D
 11111111
 11011011`;
 
-
 export const useCompressor = (initialMode: Mode = 'compress') => {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [inputMode, setInputMode] = useState<InputMode>('serial');
@@ -82,7 +81,9 @@ export const useCompressor = (initialMode: Mode = 'compress') => {
           const rowToEncode =
             currentRowIsEqualToMaxColumnRow && !foundFirstMaxColumnRowMatch
               ? row
-              : row.replace(/0+$/, '');
+              : (row = row.replace(/0+$/, (match, _, string) => {
+                  return string.slice(0, -match.length) === '' ? '0' : '';
+                }));
           if (!foundFirstMaxColumnRowMatch && currentRowIsEqualToMaxColumnRow) {
             foundFirstMaxColumnRowMatch = true;
           }

@@ -67,15 +67,17 @@ export const CompressApp: React.FC = () => {
     element.setSelectionRange(length, length);
   };
 
-  const inputModeToggle = (parallel: boolean): void =>{
+  const inputModeToggle = (parallel: boolean): void => {
     const length = compressDecompressElementRef?.current?.value?.length;
-    if(parallel && length ){
-      if(!confirm('¿Seguro que desea cambiar de modo?, se perderá los datos.')){
+    if (parallel && length) {
+      if (
+        !confirm('¿Seguro que desea cambiar de modo?, se perderá los datos.')
+      ) {
         return;
       }
     }
-    setInputMode(parallel ? 'parallel' : 'serial')
-  }
+    setInputMode(parallel ? 'parallel' : 'serial');
+  };
 
   useEffect(() => {
     if (!output) {
@@ -116,53 +118,65 @@ export const CompressApp: React.FC = () => {
               onCheckedChange={inputModeToggle}
             />
           )}
-          {mode === 'decompress' && inputMode === 'parallel' ? (
-            <div className="flex space-x-2 mb-4">
-              <CustomTextArea
-                placeholder="Parte inicial presione las teclas de la izquierda."
-                value={parallelInput[0]}
-                id="left"
-                onChange={handleInputChange}
-                onKeyPress={memoizedHandleKeyPress}
-                className="w-1/2"
-                ref={leftInputElementRef}
-              />
-              <CustomTextArea
-                placeholder="Parte final, presione las teclas de la derecha"
-                id="right"
-                value={parallelInput[1]}
-                onChange={handleInputChange}
-                onKeyPress={memoizedHandleKeyPress}
-                className="w-1/2"
-                ref={rightInputElementRef}
-              />
+          <section
+            className={mode === 'compress' ? 'flex flex-wrap gap-3' : undefined}
+          >
+            <div
+              className={mode === 'compress' ? 'flex-1 min-w-72' : undefined}
+            >
+              {mode === 'decompress' && inputMode === 'parallel' ? (
+                <div className="flex space-x-2 mb-4">
+                  <CustomTextArea
+                    placeholder="Parte inicial presione las teclas de la izquierda."
+                    value={parallelInput[0]}
+                    id="left"
+                    onChange={handleInputChange}
+                    onKeyPress={memoizedHandleKeyPress}
+                    className="w-1/2"
+                    ref={leftInputElementRef}
+                  />
+                  <CustomTextArea
+                    placeholder="Parte final, presione las teclas de la derecha"
+                    id="right"
+                    value={parallelInput[1]}
+                    onChange={handleInputChange}
+                    onKeyPress={memoizedHandleKeyPress}
+                    className="w-1/2"
+                    ref={rightInputElementRef}
+                  />
+                </div>
+              ) : (
+                <CustomTextArea
+                  placeholder={
+                    mode === 'compress'
+                      ? 'Ingrese el texto a comprimir'
+                      : 'Ingrese el texto codificado a descomprimir'
+                  }
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyPress={memoizedHandleKeyPress}
+                  ref={compressDecompressElementRef}
+                />
+              )}
+              <Button onClick={handleReset}>Reset</Button>
             </div>
-          ) : (
-            <CustomTextArea
-              placeholder={
-                mode === 'compress'
-                  ? 'Ingrese el texto a comprimir'
-                  : 'Ingrese el texto codificado a descomprimir'
-              }
-              value={input}
-              onChange={handleInputChange}
-              onKeyPress={memoizedHandleKeyPress}
-              ref={compressDecompressElementRef}
-            />
-          )}
-          <Button onClick={handleReset}>Reset</Button>
-          {mode === 'decompress' &&
-            leftInputElementRef &&
-            rightInputElementRef && (
-              <KeyBoardPressViewer
-                parallelMode={mode === 'decompress' && inputMode === 'parallel'}
-                compressDecompressElementRef={compressDecompressElementRef}
-                handleKeyPress={memoizedHandleKeyPress}
-                leftInputElementRef={leftInputElementRef}
-                rightInputElementRef={rightInputElementRef}
-              />
-            )}
-          <MatrixVisualization mode={mode} input={input} output={output} />
+            {mode === 'decompress' &&
+              leftInputElementRef &&
+              rightInputElementRef && (
+                <KeyBoardPressViewer
+                  parallelMode={
+                    mode === 'decompress' && inputMode === 'parallel'
+                  }
+                  compressDecompressElementRef={compressDecompressElementRef}
+                  handleKeyPress={memoizedHandleKeyPress}
+                  leftInputElementRef={leftInputElementRef}
+                  rightInputElementRef={rightInputElementRef}
+                />
+              )}
+            <div className={mode === 'compress' ? 'flex-1' : undefined}>
+              <MatrixVisualization mode={mode} input={input} output={output} />
+            </div>
+          </section>
           <br />
           <CopyableOutput
             title="CodeBook Arduino"

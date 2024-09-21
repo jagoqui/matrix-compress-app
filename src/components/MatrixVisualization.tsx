@@ -15,12 +15,12 @@ export const MatrixVisualization: React.FC<MatrixVisualizationProps> = ({
 }) => {
   return (
     <div className="mb-4">
-      <h3 className="text-lg font-semibold mb-3">
+      <MatrixCanvas input={mode === 'compress' ? input : output} />
+      <h3 className="text-lg font-semibold mt-3">
         {mode === 'compress'
           ? 'Visualización de Matriz Comprimida'
           : 'Visualización de Matriz Descomprimida'}
       </h3>
-      <MatrixCanvas input={mode === 'compress' ? input : output} />
     </div>
   );
 };

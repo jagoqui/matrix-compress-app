@@ -20,6 +20,7 @@ const KEY_GROUPS: Record<Icon, IconsKeys[]> = {
   '⚪': ['S', 'L'],
   '🚨': ['Q', 'I'],
   '🌿': ['E', 'P'],
+  '❌': [' ', ' '],
 };
 
 const LEFT_KEYS: (LeftIconsKeys | null)[][] = [
